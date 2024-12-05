@@ -1,0 +1,49 @@
+name: 'Cosmos Best RPC Node'
+description: 'Tests RPC nodes from a provided list and outputs the best performing node'
+author: 'Hammer Technologies LLC'
+
+inputs:
+  nodes-url:
+    description: 'URL to a text file containing RPC nodes (one per line)'
+    required: true
+    default: 'https://raw.githubusercontent.com/akash-network/net/main/mainnet/rpc-nodes.txt'
+  timeout:
+    description: 'Timeout in seconds for each RPC test'
+    required: false
+    default: '5'
+  max-block-lag:
+    description: 'Maximum acceptable block height difference from highest node'
+    required: false
+    default: '10'
+
+outputs:
+  best-node:
+    description: 'The URL of the best performing RPC node'
+  latency:
+    description: 'Latency of the selected node in milliseconds'
+  block-height:
+    description: 'Current block height of the selected node'
+
+runs:
+  using: 'composite'
+  steps:
+    - uses: actions/setup-python@v5
+      with:
+        python-version: '3.11'
+
+    - name: Install dependencies
+      shell: bash
+      run: pip install -r ${{ github.action_path }}/requirements.txt
+
+    - name: Run RPC tests
+      shell: bash
+      run: python3 ${{ github.action_path }}/main.py
+      env:
+        INPUT_NODES_URL: ${{ inputs.nodes-url }}
+        INPUT_TIMEOUT: ${{ inputs.timeout }}
+        INPUT_MAX_BLOCK_LAG: ${{ inputs.max-block-lag }}
+        GITHUB_OUTPUT: ${{ env.GITHUB_OUTPUT }}
+
+branding:
+  icon: 'activity'
+  color: 'green'
