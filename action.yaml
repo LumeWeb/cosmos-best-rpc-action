@@ -19,10 +19,13 @@ inputs:
 outputs:
   best-node:
     description: 'The URL of the best performing RPC node'
+    value: ${{ steps.rpc-test.outputs.best-node }}
   latency:
     description: 'Latency of the selected node in milliseconds'
+    value: ${{ steps.rpc-test.outputs.latency }}
   block-height:
     description: 'Current block height of the selected node'
+    value: ${{ steps.rpc-test.outputs.block-height }}
 
 runs:
   using: 'composite'
@@ -35,7 +38,8 @@ runs:
       shell: bash
       run: pip install -r ${{ github.action_path }}/requirements.txt
 
-    - name: Run RPC tests
+    - id: rpc-test
+      name: Run RPC tests
       shell: bash
       run: python3 ${{ github.action_path }}/main.py
       env:
